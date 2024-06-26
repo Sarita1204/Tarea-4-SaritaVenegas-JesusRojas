@@ -1,0 +1,92 @@
+---
+title: "Tablero"
+author: Jesús Rojas L & Sarita Venegas V 
+format: 
+  dashboard:
+    orientation: columns
+---
+
+## Carga paquetes
+```{r}
+#| label: carga-paquetes
+
+library(tidyverse)
+library(dplyr)
+library(sf)
+library(DT)
+library(plotly)
+library(leaflet)
+library(leaflet)
+library(leafem)
+```
+
+## Carga datos
+
+```{r}
+#| label: carga-datos
+
+anfibios <-
+  st_read("especies-anfibios.csv", quiet = TRUE)
+registros <-
+  st_read("registros-anfibios.csv", quiet = TRUE)
+areas <-
+  st_read("areas-conservacion.gpkg", quiet = TRUE)
+
+```
+
+## Row {height=70%}
+
+```{r}
+#| label: mapa
+#| title: "Mapa de riqueza de especies de anfibios en áreas de conservación"
+
+
+```
+
+## Row {height=30%}
+
+### Column {.tabset}
+
+```{r}
+#| label: tabla-registros
+#| title: "Cantidad de registros de presencia por categoría de Lista Roja"
+
+anfibios |>
+  st_drop_geometry() |>
+  select(Especies = species, ListaRoja = iucnRedListCategory)|>
+  group_by(ListaRoja, Especies) |>
+  summarise(Especies = Especies)|> datatable()
+
+
+```
+
+### Column 
+
+```{r}
+#| label: grafico-1
+#| title: "Cantidad de especies en categorías CR, EN y VU de la Lista Roja"
+
+grafico_ggplot1 <-
+  anfibios |>
+  st_drop_geometry() |> 
+  filter(iucnRedListCategory == "VU" |
+           iucnRedListCategory == "CR" |
+           iucnRedListCategory == "EN") |>
+  group_by(iucnRedListCategory) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = iucnRedListCategory, y = (n))) +
+  geom_col() + 
+  xlab("Lista Roja") +
+  ylab("Cantidad de especies") 
+
+ggplotly(grafico_ggplot1) |> config(locale = "es")
+```
+
+
+```{r}
+#| label: grafico-2
+#| title: "Riqueza de especies de anfibios en áreas de conservación"
+
+
+```
+
